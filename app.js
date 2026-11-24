@@ -1,14 +1,16 @@
+const DEFAULTS = {
+  primary: '#3774d6',
+  bg: '#050608',
+  text: '#e2e4e8',
+  radius: '10',
+  gap: '14'
+}
+
 class TokenStudio extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.data = {
-      primary: '#3b82f6',
-      bg: '#111827',
-      text: '#f3f4f6',
-      radius: '10',
-      gap: '14'
-    };
+    this.data = { ...DEFAULTS };
   }
 
   connectedCallback() {
