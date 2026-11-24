@@ -48,7 +48,7 @@ class TokenStudio extends HTMLElement {
           border: 1px solid var(--primary);
           background: none;
           color: inherit;
-          border-radius: 6px;
+          border-radius: var(--radius);
           cursor: pointer;
         }
 
