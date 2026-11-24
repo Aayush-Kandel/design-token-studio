@@ -65,7 +65,53 @@ class TokenStudio extends HTMLElement {
           gap: 8px;
         }
 
-        pre { background: #00000055; padding: 12px; border-radius: 6px; overflow-x: auto; }
+        pre { 
+          background: #00000055; 
+          padding: 12px; 
+          border-radius: 6px; 
+          overflow-x: auto; 
+        }
+
+        hr { 
+          border: 0; 
+          border-top: 1px solid #ffffff25; 
+          margin: 20px 0; 
+        }
+
+        .row { 
+          background: var(--primary); 
+          color: #fff; 
+          padding: 
+          2px 8px; 
+          border-radius:99px; 
+          font-size: 12px;
+          width: fit-content;
+        }
+        
+        .tag 
+        { 
+          background: var(--primary); 
+          color: #fff; 
+          padding: 2px 8px; 
+          border-radius: 99px; 
+          font-size: 12px; 
+          width: fit-content; 
+        }
+
+        .ghost 
+        { 
+          border-color: transparent; 
+        }
+
+        input[type = "text"] {
+          flex:1;
+          padding:8px ;
+          border-radius: var(--radius);
+          border: 1px solid #ffffff30;
+          background: none;
+          color: inherit;
+        }
+
       </style>
 
       <h2>Design Token Studio</h2>
