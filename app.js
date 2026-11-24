@@ -142,6 +142,26 @@ class TokenStudio extends HTMLElement {
         <pre id="css-out"></pre>
         <button id="copy-btn">Copy CSS</button>
       </div>
+      <hr>
+        <div class = "card">
+          <span class = "tag">Badge</span>
+          <strong>Card Title</strong>
+          <span>Preview updates live!</span>
+        </div>
+        
+        <div class = "row">
+          <button class = "active">Primary</button>
+          <button>Secondary</button>
+          <button class = "ghost">Ghost</button>
+        </div>
+
+        <div class = "row">
+          <input type = "text" placeholder="Typing..?">
+          <button class = "active">Send</button>
+        </div>
+
+        <div class = "row card">Alert: Check border and contrast.
+        </div>
     `;
 
     const panels = [s.getElementById('p-palette'), s.getElementById('p-layout'), s.getElementById('p-export')];
