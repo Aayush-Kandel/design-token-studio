@@ -32,7 +32,17 @@ class TokenStudio extends HTMLElement {
           color: var(--text);
           border-radius: var(--radius);
         }
-        nav { display: flex; gap: 8px; margin-bottom: 20px; }
+
+        nav { 
+          display: flex; 
+          gap: 8px; 
+          margin-bottom: 20px;
+        }
+        #reset-btn {
+          margin-left: auto;
+          border-color: #ffffff40;
+        }
+
         button {
           padding: 8px 14px;
           border: 1px solid var(--primary);
@@ -41,8 +51,11 @@ class TokenStudio extends HTMLElement {
           border-radius: 6px;
           cursor: pointer;
         }
+
         button.active, #copy-btn { background: var(--primary); color: #fff; }
+
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--gap); }
+
         .card {
           padding: 14px;
           border: 1px solid #ffffff30;
@@ -51,6 +64,7 @@ class TokenStudio extends HTMLElement {
           flex-direction: column;
           gap: 8px;
         }
+
         pre { background: #00000055; padding: 12px; border-radius: 6px; overflow-x: auto; }
       </style>
 
@@ -59,6 +73,7 @@ class TokenStudio extends HTMLElement {
         <button id="b-palette" class="active">Palette</button>
         <button id="b-layout">Layout</button>
         <button id="b-export">Export</button>
+        <button id="reset-btn">Reset</button>
       </nav>
 
       <div id="p-palette" class="grid">
@@ -71,6 +86,7 @@ class TokenStudio extends HTMLElement {
         <label class="card">Radius (<span id="rad-num">10</span>px)
           <input type="range" id="radius" min="0" max="32" value="10">
         </label>
+
         <label class="card">Gap (<span id="gap-num">14</span>px)
           <input type="range" id="gap" min="4" max="48" value="14">
         </label>
@@ -104,6 +120,15 @@ class TokenStudio extends HTMLElement {
       navigator.clipboard.writeText(s.getElementById('css-out').textContent);
       copyBtn.textContent = 'Copied!';
       setTimeout(() => { copyBtn.textContent = 'Copy CSS'; }, 1000);
+    };
+
+    s.getElementById('reset-btn').onclick = () => {
+      this.data = {  ...DEFAULTS };
+
+      Object.entries(this.data).forEach(([id, val]) => {
+        s.getElementById(id).value = val;
+      });
+      this.updateUI();
     };
 
     this.updateUI();
