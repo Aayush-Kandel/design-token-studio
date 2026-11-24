@@ -33,6 +33,11 @@ class TokenStudio extends HTMLElement {
           border-radius: var(--radius);
         }
 
+        [hidden]
+        {
+          display:none;
+        }
+
         nav { 
           display: flex; 
           gap: 8px; 
@@ -79,13 +84,9 @@ class TokenStudio extends HTMLElement {
         }
 
         .row { 
-          background: var(--primary); 
-          color: #fff; 
-          padding: 
-          2px 8px; 
-          border-radius:99px; 
-          font-size: 12px;
-          width: fit-content;
+          display:flex;
+          gap: var(--gap);
+          margin-gap: var(--gap);
         }
         
         .tag 
@@ -129,11 +130,11 @@ class TokenStudio extends HTMLElement {
       </div>
 
       <div id="p-layout" class="grid" hidden>
-        <label class="card">Radius (<span id="rad-num">10</span>px)
+        <label class="card"><span>Radius (<span id="rad-num">10</span>px)</span>
           <input type="range" id="radius" min="0" max="32" value="10">
         </label>
 
-        <label class="card">Gap (<span id="gap-num">14</span>px)
+        <label class="card"><span>Gap (<span id="gap-num">14</span>px)</span>
           <input type="range" id="gap" min="4" max="48" value="14">
         </label>
       </div>
@@ -148,7 +149,7 @@ class TokenStudio extends HTMLElement {
           <strong>Card Title</strong>
           <span>Preview updates live!</span>
         </div>
-        
+
         <div class = "row">
           <button class = "active">Primary</button>
           <button>Secondary</button>
