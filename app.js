@@ -1,10 +1,18 @@
 const DEFAULTS = {
   primary: '#3774d6',
   bg: '#050608',
+  surface: #111827,
   text: '#e2e4e8',
   radius: '10',
   gap: '14'
-}
+};
+
+const lum = (hex) => [1,3,5]
+  .map((i) => parseInt(hex.slice(i,i+2), 16)/255 )
+  .map((c) => [((c + 0.055)/1.055) ** 2.4, c/12.92][Number(c <= 0.03928)])
+  .reduce((acc, v, i) => acc + v * [0.2126, 0.7152, 0.0722][i], 0);
+
+const randHex = () => '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6,'0');
 
 class TokenStudio extends HTMLElement {
   constructor() {
@@ -33,8 +41,7 @@ class TokenStudio extends HTMLElement {
           border-radius: var(--radius);
         }
 
-        [hidden]
-        {
+        [hidden]{
           display:none;
         }
 
