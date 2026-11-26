@@ -7,10 +7,9 @@ const DEFAULTS = {
   gap: '14'
 };
 
-const lum = (hex) => [1,3,5]
-  .map((i) => parseInt(hex.slice(i,i+2), 16)/255 )
-  .map((c) => [((c + 0.055)/1.055) ** 2.4, c/12.92][Number(c <= 0.03928)])
-  .reduce((acc, v, i) => acc + v * [0.2126, 0.7152, 0.0722][i], 0);
+const lum = (hex) => [1, 3, 5]
+  .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+  .reduce((sum, c) => sum + c, 0) / 3;
 
 const randHex = () => '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6,'0');
 
@@ -252,13 +251,17 @@ class TokenStudio extends HTMLElement {
 
     const badge = s.getElementById('contrast-badge');
     badge.textContent = `${ratio.toFixed(2)}:1 ${['Fail', 'AA Large', 'AA', 'AAA'][score]}`;
+    badge.style.background = ['#dc2626', '#ca8a04', '#16a34a', '#16a34a'][score];
+    badge.style.color = '#fff';
 
     s.getElementById('rad-num').textContent = d.radius;
     s.getElementById('gap-num').textContent = d.gap;
     s.getElementById('css-out').textContent =
 `:root {
   --primary: ${d.primary};
+  --primary-fg: ${fg};
   --bg: ${d.bg};
+  --surface: ${d.surface};
   --text: ${d.text};
   --radius: ${d.radius}px;
   --gap: ${d.gap}px;
