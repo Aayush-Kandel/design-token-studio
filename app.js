@@ -99,7 +99,7 @@ class TokenStudio extends HTMLElement {
         .row { 
           display:flex;
           gap: var(--gap);
-          margin-gap: var(--gap);
+          margin-top: var(--gap);
         }
         
         .tag 
@@ -230,7 +230,7 @@ class TokenStudio extends HTMLElement {
 
   syncInputs(){
     Object.entries(this.data).forEach(([id, val]) => {
-      s.getElementById(id).value = val;
+      this.shadowRoot.getElementById(id).value = val;
     });
   this.updateUI();
   }
