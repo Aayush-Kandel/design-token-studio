@@ -18,6 +18,7 @@ class TokenStudio extends HTMLElement {
     super();
     this.attachShadow({ mode: 'open' });
     this.data = { ...DEFAULTS };
+    this.fmt = 'css';
   }
 
   connectedCallback() {
@@ -84,10 +85,22 @@ class TokenStudio extends HTMLElement {
         }
 
         pre { 
+          margin: 0;
           background: color-mix(in srgb, var(--text) 8%, var(--bg)); 
-          padding: 12px; 
-          border-radius: 6px; 
+          border: 1px solid color-mix(in srgb, var(--text) 15%, transparent);
+          padding: 14px; 
+          border-radius: calc(var(--radius) * 0.75); 
+          font-family: monospace;
+          font-size: 13px;
+          line-height: 1.5;
           overflow-x: auto; 
+        }
+
+        .export-bar, .tabs{
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap:6px;
         }
 
         hr { 
@@ -166,9 +179,17 @@ class TokenStudio extends HTMLElement {
       </div>
 
       <div id="p-export" class="card" hidden>
+        <div class="export-bar">
+          <div class="tabs">
+            <button data-fmt="css" class="active">CSS</button>
+            <button data-fmt="json">JSON</button>
+            <button data-fmt="tw">Tailwind</button>
+          </div>
+          <button id="copy-btn">Copy</button>
+        </div>
         <pre id="css-out"></pre>
-        <button id="copy-btn">Copy CSS</button>
       </div>
+
       <hr>
         <div class = "card">
           <span class = "tag">Badge</span>
@@ -208,12 +229,27 @@ class TokenStudio extends HTMLElement {
       };
     });
 
+
+    const fmtBtns = s.querySelectorAll('[data-fmt]');
+    fmtBtns.forEach((btn) => {
+      btn.onclick = () => {
+        this.fmt = btn.CDATA_SECTION_NODE.fmt;
+        fmtBtns.forEach((b) => {
+          b.className = ['', 'active',][Number(b === btn)]; 
+        })
+        this.updateUI();
+      };
+    });
+
     const copyBtn = s.getElementById('copy-btn');
-    copyBtn.onclick = () => { 
+    copyBtn.onclick = () => {
       navigator.clipboard.writeText(s.getElementById('css-out').textContent);
       copyBtn.textContent = 'Copied!';
-      setTimeout(() => { copyBtn.textContent = 'Copy CSS'; }, 1000);
-    };
+      setTimeout(() => {
+        copyBtn.textContent = 'Copy';
+      }, 1000);
+    }
+
 
     s.getElementById('random-btn').onclick = () => {
       Object.assign(this.data, {primary: randHex(), bg: randHex(), surface: randHex(), text: randHex()});
@@ -256,16 +292,40 @@ class TokenStudio extends HTMLElement {
 
     s.getElementById('rad-num').textContent = d.radius;
     s.getElementById('gap-num').textContent = d.gap;
-    s.getElementById('css-out').textContent =
-`:root {
-  --primary: ${d.primary};
-  --primary-fg: ${fg};
-  --bg: ${d.bg};
-  --surface: ${d.surface};
-  --text: ${d.text};
-  --radius: ${d.radius}px;
-  --gap: ${d.gap}px;
-}`;
+    
+    const formats = {
+      css: `:root{
+      --primary: ${d.primary};
+      --primary-fg: ${fg};
+      --bg: ${d.bg};
+      --surface: ${d.surface};
+      --text: ${d.text};
+      --radius: ${d.radius}px;
+      --gap: ${d.gap}px;
+      }`,
+
+      json: JSON.stringify({
+        primary: d.primary,
+        primaryFg: fg,
+        bg: d.bg,
+        surface: d.surface,
+        text: d.text,
+        radius: d.radius + 'px',
+        gap: d.gap + 'px'
+      }, null, 2),
+      tw: `@theme {
+      --color-primary: ${d.primary};
+      --color-primary-fg: ${fg};
+      --color-bg: ${d.bg};
+      --color-surface: ${d.surface};
+      --color-text: ${d.text};
+      --radius-base: ${d.radius}px;
+      --spacing-gap: ${d.gap}px;
+      }`
+
+    };
+    s.getElementById('css-out').textContent = formats[this.fmt];
+
   }
 }
 
