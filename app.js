@@ -1,7 +1,7 @@
 const DEFAULTS = {
   primary: '#3774d6',
   bg: '#050608',
-  surface: #111827,
+  surface: '#111827',
   text: '#e2e4e8',
   radius: '10',
   gap: '14'
@@ -27,7 +27,9 @@ class TokenStudio extends HTMLElement {
       <style>
         :host {
           --primary: #3b82f6;
+          --primary-fg: #ffffff;
           --bg: #111827;
+          --surface: #111827;
           --text: #f3f4f6;
           --radius: 10px;
           --gap: 14px;
@@ -42,7 +44,7 @@ class TokenStudio extends HTMLElement {
         }
 
         [hidden]{
-          display:none;
+          display:none !important;
         }
 
         nav { 
@@ -50,9 +52,13 @@ class TokenStudio extends HTMLElement {
           gap: 8px; 
           margin-bottom: 20px;
         }
-        #reset-btn {
+
+        #random-btn {
           margin-left: auto;
-          border-color: #ffffff40;
+        }
+
+        #random-btn, #reset-btn{
+          border-color: color-mix(in srgb, var(--text) 30%, transparent);
         }
 
         button {
@@ -64,13 +70,14 @@ class TokenStudio extends HTMLElement {
           cursor: pointer;
         }
 
-        button.active, #copy-btn { background: var(--primary); color: #fff; }
+        button.active, #copy-btn { background: var(--primary); color: var(--primary-fg); }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--gap); }
 
         .card {
           padding: 14px;
-          border: 1px solid #ffffff30;
+          background: var(--surface);
+          border: 1px solid color-mix(in srgb, var(--text) 20%, transparent);
           border-radius: var(--radius);
           display: flex;
           flex-direction: column;
@@ -78,7 +85,7 @@ class TokenStudio extends HTMLElement {
         }
 
         pre { 
-          background: #00000055; 
+          background: color-mix(in srgb, var(--text) 8%, var(--bg)); 
           padding: 12px; 
           border-radius: 6px; 
           overflow-x: auto; 
@@ -86,7 +93,7 @@ class TokenStudio extends HTMLElement {
 
         hr { 
           border: 0; 
-          border-top: 1px solid #ffffff25; 
+          border-top: 1px solid color-mix(in srgb, var(--text) 20%, transparent); 
           margin: 20px 0; 
         }
 
@@ -99,25 +106,29 @@ class TokenStudio extends HTMLElement {
         .tag 
         { 
           background: var(--primary); 
-          color: #fff; 
+          color: var(--primary-fg); 
           padding: 2px 8px; 
           border-radius: 99px; 
           font-size: 12px; 
           width: fit-content; 
         }
 
-        .ghost 
-        { 
-          border-color: transparent; 
-        }
+        .ghost { border-color: transparent; }
 
         input[type = "text"] {
           flex:1;
           padding:8px ;
           border-radius: var(--radius);
-          border: 1px solid #ffffff30;
-          background: none;
+          border: 1px solid color-mix(in srgb, var(--text) 25%, transparent);
+          background: var(--surface);
           color: inherit;
+        }
+
+        .contrast {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: var(--gap);
         }
 
       </style>
@@ -127,13 +138,22 @@ class TokenStudio extends HTMLElement {
         <button id="b-palette" class="active">Palette</button>
         <button id="b-layout">Layout</button>
         <button id="b-export">Export</button>
+        <button id="random-btn">Randomize</button>
         <button id="reset-btn">Reset</button>
       </nav>
 
-      <div id="p-palette" class="grid">
-        <label class="card">Primary <input type="color" id="primary" value="#3b82f6"></label>
-        <label class="card">Background <input type="color" id="bg" value="#111827"></label>
-        <label class="card">Text <input type="color" id="text" value="#f3f4f6"></label>
+      <div id="p-palette">
+        <div class="grid">
+          <label class="card">Primary <input type="color" id="primary"></label>
+          <label class="card">Background <input type="color" id="bg"></label>
+          <label class="card">Surface <input type="color" id="surface"></label>
+          <label class="card">Text <input type="color" id="text"></label>
+        </div>
+
+        <div class = "card contrast">
+          <span>Contrast (Text/Bg)</span>
+          <span id = "contrast-badge" class = "tag"></span>
+        </div>
       </div>
 
       <div id="p-layout" class="grid" hidden>
@@ -182,7 +202,7 @@ class TokenStudio extends HTMLElement {
       };
     });
 
-    ['primary', 'bg', 'text', 'radius', 'gap'].forEach((id) => {
+    Object.keys(DEFAULTS).forEach((id) => {
       s.getElementById(id).oninput = (e) => {
         this.data[id] = e.target.value;
         this.updateUI();
@@ -190,35 +210,52 @@ class TokenStudio extends HTMLElement {
     });
 
     const copyBtn = s.getElementById('copy-btn');
-    copyBtn.onclick = () => {
+    copyBtn.onclick = () => { 
       navigator.clipboard.writeText(s.getElementById('css-out').textContent);
       copyBtn.textContent = 'Copied!';
       setTimeout(() => { copyBtn.textContent = 'Copy CSS'; }, 1000);
     };
 
-    s.getElementById('reset-btn').onclick = () => {
-      this.data = {  ...DEFAULTS };
-
-      Object.entries(this.data).forEach(([id, val]) => {
-        s.getElementById(id).value = val;
-      });
-      this.updateUI();
+    s.getElementById('random-btn').onclick = () => {
+      Object.assign(this.data, {primary: randHex(), bg: randHex(), surface: randHex(), text: randHex()});
+      this.syncInputs();
     };
 
-    this.updateUI();
+    s.getElementById('reset-btn').onclick = () => {
+      this.data = {  ...DEFAULTS };
+      this.syncInputs();
+    };
+
+    this.syncInputs();
+  }
+
+  syncInputs(){
+    Object.entries(this.data).forEach(([id, val]) => {
+      s.getElementById(id).value = val;
+    });
+  this.updateUI();
   }
 
   updateUI() {
     const d = this.data;
-    this.style.setProperty('--primary', d.primary);
-    this.style.setProperty('--bg', d.bg);
-    this.style.setProperty('--text', d.text);
+    const s = this.shadowRoot;
+    const fg = ['#000000', '#ffffff'][Number(lum(d.primary) < 0.5)];
+
+    ['primary', 'bg', 'surface', 'text'].forEach((k) => this.style.setProperty(`--${k}`, d[k]));
+    this.style.setProperty('--primary-fg', fg);
     this.style.setProperty('--radius', d.radius + 'px');
     this.style.setProperty('--gap', d.gap + 'px');
 
-    this.shadowRoot.getElementById('rad-num').textContent = d.radius;
-    this.shadowRoot.getElementById('gap-num').textContent = d.gap;
-    this.shadowRoot.getElementById('css-out').textContent =
+    const [l1, l2] = [lum(d.text), lum(d.bg)];
+    const ratio = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    const score = Number(ratio >= 3) + Number(ratio >= 4.5) + Number(ratio >= 7);
+
+    const badge = s.getElementById('contrast-badge');
+    badge.textContent = `${ratio.toFixed(2)}:1 ${['Fail', 'AA Large', 'AA', 'AAA'][score]}`;
+
+    s.getElementById('rad-num').textContent = d.radius;
+    s.getElementById('gap-num').textContent = d.gap;
+    s.getElementById('css-out').textContent =
 `:root {
   --primary: ${d.primary};
   --bg: ${d.bg};
